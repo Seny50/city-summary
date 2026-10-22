@@ -32,6 +32,12 @@ python main.py --city Moscow
 python main.py --city Moscow --currency EUR
 ```
 
+JSON для интеграций:
+
+```bash
+python main.py --city Moscow --currency EUR --json
+```
+
 ## Коды выхода
 
 - `0` — сводка получена;

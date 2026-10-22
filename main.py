@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import re
 import sys
 from collections.abc import Sequence
@@ -29,6 +30,7 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         default="USD",
         help="Трёхбуквенный ISO-код валюты (по умолчанию USD)",
     )
+    parser.add_argument("--json", action="store_true", help="Вывести сводку в JSON")
     args = parser.parse_args(argv)
     if not args.city.strip():
         parser.error("--city не может быть пустым")
@@ -66,7 +68,10 @@ def main(argv: Sequence[str] | None = None) -> int:
         print(f"Ошибка внешнего сервиса: {error}", file=sys.stderr)
         return 4
 
-    print(format_summary(summary))
+    if args.json:
+        print(json.dumps(summary, ensure_ascii=False, indent=2))
+    else:
+        print(format_summary(summary))
     return 0
 
 

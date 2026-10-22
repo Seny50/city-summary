@@ -3,7 +3,11 @@ from __future__ import annotations
 import time
 from typing import Any
 
-from clients.exceptions import CurrencyNotFoundError, ExternalResponseError
+from clients.exceptions import (
+    CurrencyNotFoundError,
+    ExternalNotFoundError,
+    ExternalResponseError,
+)
 from clients.http import HttpClient
 
 FRANKFURTER_RATE_URL = "https://api.frankfurter.dev/v2/rate/{currency}/RUB"
@@ -20,7 +24,12 @@ def get_rate(currency: str, http_client: HttpClient | None = None) -> float:
         return cached[1]
 
     client = http_client or HttpClient()
-    payload = client.get_json(FRANKFURTER_RATE_URL.format(currency=normalized_currency))
+    try:
+        payload = client.get_json(
+            FRANKFURTER_RATE_URL.format(currency=normalized_currency)
+        )
+    except ExternalNotFoundError as error:
+        raise CurrencyNotFoundError("Код валюты не найден.") from error
     rate = _rate_from_payload(payload)
     _rate_cache[normalized_currency] = (now, rate)
     return rate

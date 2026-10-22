@@ -4,6 +4,7 @@ import unittest
 from unittest.mock import patch
 
 import main
+from clients.exceptions import CurrencyNotFoundError
 
 
 class MainTests(unittest.TestCase):
@@ -21,3 +22,16 @@ class MainTests(unittest.TestCase):
 
         self.assertEqual(exit_code, 0)
         self.assertEqual(json.loads(stdout.getvalue())["city"], "Moscow")
+
+    @patch("main.build_city_summary")
+    def test_missing_currency_returns_exit_code_three(
+        self, build_summary: object
+    ) -> None:
+        build_summary.side_effect = CurrencyNotFoundError("Код валюты не найден.")
+        stderr = io.StringIO()
+
+        with patch("sys.stderr", stderr):
+            exit_code = main.main(["--city", "Moscow", "--currency", "ZZZ"])
+
+        self.assertEqual(exit_code, 3)
+        self.assertIn("Код валюты не найден", stderr.getvalue())

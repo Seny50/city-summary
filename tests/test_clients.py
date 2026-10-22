@@ -3,7 +3,12 @@ from unittest.mock import Mock, patch
 
 import requests
 
-from clients.exceptions import CityNotFoundError, ServiceUnavailableError
+from clients.exceptions import (
+    CityNotFoundError,
+    CurrencyNotFoundError,
+    ExternalNotFoundError,
+    ServiceUnavailableError,
+)
 from clients.http import HttpClient
 from clients.rates import _rate_cache, get_rate
 from clients.weather import get_weather
@@ -42,6 +47,13 @@ class RateClientTests(unittest.TestCase):
 
         self.assertEqual(rate, 92.15)
         client.get_json.assert_called_once()
+
+    def test_get_rate_maps_missing_currency_to_domain_error(self) -> None:
+        client = Mock()
+        client.get_json.side_effect = ExternalNotFoundError("missing")
+
+        with self.assertRaises(CurrencyNotFoundError):
+            get_rate("ZZZ", client)
 
 
 class HttpClientTests(unittest.TestCase):

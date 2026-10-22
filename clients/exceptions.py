@@ -10,6 +10,10 @@ class ExternalResponseError(ExternalServiceError):
     """Raised when an external service returns an invalid response."""
 
 
+class ExternalNotFoundError(ExternalResponseError):
+    """Raised when an external API explicitly reports a missing resource."""
+
+
 class CityNotFoundError(ExternalServiceError):
     """Raised when a requested city cannot be found."""
 

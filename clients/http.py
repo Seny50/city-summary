@@ -5,7 +5,11 @@ from typing import Any
 
 import requests
 
-from clients.exceptions import ExternalResponseError, ServiceUnavailableError
+from clients.exceptions import (
+    ExternalNotFoundError,
+    ExternalResponseError,
+    ServiceUnavailableError,
+)
 
 DEFAULT_TIMEOUT_SECONDS = 8
 MAX_ATTEMPTS = 3
@@ -58,6 +62,11 @@ class HttpClient:
                     time.sleep(1)
                     continue
                 raise last_error
+
+            if response.status_code == 404:
+                raise ExternalNotFoundError(
+                    "Запрошенный ресурс не найден во внешнем сервисе."
+                )
 
             if not 200 <= response.status_code < 300:
                 raise ExternalResponseError(

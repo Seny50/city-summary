@@ -5,7 +5,6 @@ from typing import Any
 
 from clients.exceptions import (
     CurrencyNotFoundError,
-    ExternalNotFoundError,
     ExternalResponseError,
 )
 from clients.http import HttpClient
@@ -28,7 +27,7 @@ def get_rate(currency: str, http_client: HttpClient | None = None) -> float:
         payload = client.get_json(
             FRANKFURTER_RATE_URL.format(currency=normalized_currency)
         )
-    except ExternalNotFoundError as error:
+    except ExternalResponseError as error:
         raise CurrencyNotFoundError("Код валюты не найден.") from error
     rate = _rate_from_payload(payload)
     _rate_cache[normalized_currency] = (now, rate)

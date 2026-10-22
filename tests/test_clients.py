@@ -6,7 +6,7 @@ import requests
 from clients.exceptions import (
     CityNotFoundError,
     CurrencyNotFoundError,
-    ExternalNotFoundError,
+    ExternalResponseError,
     ServiceUnavailableError,
 )
 from clients.http import HttpClient
@@ -50,7 +50,7 @@ class RateClientTests(unittest.TestCase):
 
     def test_get_rate_maps_missing_currency_to_domain_error(self) -> None:
         client = Mock()
-        client.get_json.side_effect = ExternalNotFoundError("missing")
+        client.get_json.side_effect = ExternalResponseError("invalid currency")
 
         with self.assertRaises(CurrencyNotFoundError):
             get_rate("ZZZ", client)

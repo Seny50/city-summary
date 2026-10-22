@@ -35,3 +35,18 @@ class MainTests(unittest.TestCase):
 
         self.assertEqual(exit_code, 3)
         self.assertIn("Код валюты не найден", stderr.getvalue())
+
+    @patch("main.build_city_summary")
+    def test_currency_defaults_to_usd(self, build_summary: object) -> None:
+        build_summary.return_value = {
+            "city": "Moscow",
+            "weather": {"temp_c": 1.0, "description": "ясно", "warm_clothes": False},
+            "rates": {"currency": "USD", "rate_to_rub": 90.0, "expensive": False},
+        }
+        stdout = io.StringIO()
+
+        with patch("sys.stdout", stdout):
+            exit_code = main.main(["--city", "Moscow"])
+
+        self.assertEqual(exit_code, 0)
+        build_summary.assert_called_once_with("Moscow", "USD")
